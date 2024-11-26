@@ -1,124 +1,126 @@
 package vn.edu.hust.activityexamples
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.view.ContextMenu
-import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.AdapterView.AdapterContextMenuInfo
+import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.ListView
-import android.widget.TextView
-import android.widget.Toast
-import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 
 class MainActivity : AppCompatActivity() {
-  override fun onCreate(savedInstanceState: Bundle?) {
-    super.onCreate(savedInstanceState)
-    setContentView(R.layout.activity_main)
 
-    // TODO: Thiet lap thuoc tinh thanh action bar
-//    supportActionBar?.title = "Hello"
-//    supportActionBar?.setDisplayShowHomeEnabled(true)
-//    supportActionBar?.setIcon(R.mipmap.ic_launcher)
-//    supportActionBar?.setBackgroundDrawable(resources.getDrawable(R.drawable.gradient_background, null))
+    private val studentList = mutableListOf<Student>()
+    private lateinit var studentAdapter: ArrayAdapter<String>
 
-    // TODO: Mo activity trong cung ung dung bang intent xac dinh
-    findViewById<Button>(R.id.button_open).setOnClickListener {
-      val intent = Intent(this, SecondActivity::class.java)
-      intent.putExtra("param1", 123)
-      intent.putExtra("param2", 3.14)
-      intent.putExtra("param3", "hello")
-      startActivity(intent)
-    }
+    private val launcher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            val hoten = result.data?.getStringExtra("hoten")
+            val mssv = result.data?.getStringExtra("mssv")
+            val position = result.data?.getIntExtra("position", -1)
 
-    // TODO: Mo activity trong ung dung khac dung intent ngam dinh
-    findViewById<Button>(R.id.button_open_other).setOnClickListener {
-//      val intent = Intent(Intent.ACTION_DIAL, Uri.parse("tel:098764321"))
-//      val intent = Intent(Intent.ACTION_VIEW, Uri.parse("geo:0,0?q=Back+Khoa"))
-//      val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://hust.edu.vn"))
-
-      val intent = Intent(Intent.ACTION_SEND)
-      intent.type = "text/plain"
-      intent.putExtra(Intent.EXTRA_EMAIL, arrayOf("test1@gmail.com", "test2@gmail.com"))
-      intent.putExtra(Intent.EXTRA_SUBJECT, "Email title")
-      intent.putExtra(Intent.EXTRA_TEXT, "This is the email content")
-
-      startActivity(intent)
-    }
-
-    val textResult = findViewById<TextView>(R.id.text_result)
-
-    // TODO: Su dung launcher de mo activity va xu ly ket qua tra ve
-    val launcher = registerForActivityResult(ActivityResultContracts.StartActivityForResult(),
-      { it: ActivityResult ->
-        if (it.resultCode == RESULT_OK) {
-          val hoten = it.data?.getStringExtra("hoten")
-          val mssv = it.data?.getStringExtra("mssv")
-          textResult.text = "$hoten - $mssv"
-        } else {
-          textResult.text = "CANCELLED"
+            if (hoten != null && mssv != null) {
+                if (position != null && position != -1) {
+                    // Nếu có position, tức là đang sửa sinh viên
+                    studentList[position] = Student(hoten, mssv)
+                } else {
+                    // Nếu không có position, tức là thêm mới sinh viên
+                    studentList.add(Student(hoten, mssv))
+                }
+                updateStudentList() // Cập nhật lại ListView
+            }
         }
-      })
-
-    findViewById<Button>(R.id.button_add_student).setOnClickListener {
-      val intent = Intent(this, AddStudentActivity::class.java)
-      launcher.launch(intent)
     }
 
-    // TODO: Thiet lap context menu cho doi tuong ImageView
-//    val imageView = findViewById<ImageView>(R.id.imageView)
-//    registerForContextMenu(imageView)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
 
+        supportActionBar?.title = "Student Management"
+        supportActionBar?.setDisplayShowHomeEnabled(true)
+        supportActionBar?.setIcon(R.mipmap.ic_launcher)
+        supportActionBar?.setBackgroundDrawable(resources.getDrawable(R.drawable.gradient_background, null))
 
-    val items = mutableListOf<String>()
-    for (i in 1..50)
-      items.add("Item $i")
-    val listView = findViewById<ListView>(R.id.listView)
-    listView.adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, items)
+        val listView = findViewById<ListView>(R.id.listView)
+        val items = mutableListOf<String>()
 
-    // TODO: Thiet lap context menu cho doi tuong ListView
-    registerForContextMenu(listView)
-  }
+        studentAdapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, items)
+        listView.adapter = studentAdapter
 
-  // TODO: Ham khoi tao cho context menu
-  override fun onCreateContextMenu(
-    menu: ContextMenu?,
-    v: View?,
-    menuInfo: ContextMenu.ContextMenuInfo?
-  ) {
-    menuInflater.inflate(R.menu.main_menu, menu)
-    super.onCreateContextMenu(menu, v, menuInfo)
-  }
+        // Thêm dữ liệu mẫu
+        studentList.add(Student("Nguyễn Văn An", "SV001"))
+        studentList.add(Student("Trần Thị Bảo", "SV002"))
+        studentList.add(Student("Lê Hoàng Cường", "SV003"))
+        studentList.add(Student("Phạm Thị Dung", "SV004"))
+        studentList.add(Student("Đỗ Minh Đức", "SV005"))
+        studentList.add(Student("Vũ Thị Hoa", "SV006"))
+        studentList.add(Student("Hoàng Văn Hải", "SV007"))
+        studentList.add(Student("Bùi Thị Hạnh", "SV008"))
+        studentList.add(Student("Đinh Văn Hùng", "SV009"))
+        studentList.add(Student("Nguyễn Thị Linh", "SV010"))
+        studentList.add(Student("Phạm Văn Long", "SV011"))
+        studentList.add(Student("Trần Thị Mai", "SV012"))
+        studentList.add(Student("Lê Thị Ngọc", "SV013"))
+        studentList.add(Student("Vũ Văn Nam", "SV014"))
+        studentList.add(Student("Hoàng Thị Phương", "SV015"))
+        studentList.add(Student("Đỗ Văn Quân", "SV016"))
+        studentList.add(Student("Nguyễn Thị Thu", "SV017"))
+        studentList.add(Student("Trần Văn Tài", "SV018"))
+        studentList.add(Student("Phạm Thị Tuyết", "SV019"))
+        studentList.add(Student("Lê Văn Vũ", "SV020"))
+        updateStudentList()
 
-  // TODO: Ham xu ly su kien nhan vao context menu
-  override fun onContextItemSelected(item: MenuItem): Boolean {
-    val pos = (item.menuInfo as AdapterContextMenuInfo).position
-    when (item.itemId) {
-      R.id.action_share -> {Toast.makeText(this, "Share $pos", Toast.LENGTH_LONG).show()}
-      R.id.action_download -> {Toast.makeText(this, "Download $pos", Toast.LENGTH_LONG).show()}
-      R.id.action_settings -> {Toast.makeText(this, "Settings $pos", Toast.LENGTH_LONG).show()}
+        findViewById<Button>(R.id.button_add_student).setOnClickListener {
+            val intent = Intent(this, AddStudentActivity::class.java)
+            launcher.launch(intent) // Mở AddStudentActivity
+        }
+
+        registerForContextMenu(listView) // Đăng ký Context Menu cho ListView
     }
-    return super.onContextItemSelected(item)
-  }
 
-  // TODO: Ham khoi tao option menu
-  override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-    menuInflater.inflate(R.menu.main_menu, menu)
-    return super.onCreateOptionsMenu(menu)
-  }
-
-  // TODO: Ham xu ly su kien nhan vao option menu
-  override fun onOptionsItemSelected(item: MenuItem): Boolean {
-    when (item.itemId) {
-      R.id.action_share -> {Toast.makeText(this, "Share", Toast.LENGTH_LONG).show()}
-      R.id.action_download -> {Toast.makeText(this, "Download", Toast.LENGTH_LONG).show()}
-      R.id.action_settings -> {Toast.makeText(this, "Settings", Toast.LENGTH_LONG).show()}
+    private fun updateStudentList() {
+        val studentNames = studentList.map { "${it.hoten} - ${it.mssv}" }
+        studentAdapter.clear()
+        studentAdapter.addAll(studentNames)
+        studentAdapter.notifyDataSetChanged() // Cập nhật lại ListView
     }
-    return super.onOptionsItemSelected(item)
-  }
+
+    // Thiết lập Context Menu
+    override fun onCreateContextMenu(
+        menu: ContextMenu?,
+        v: View?,
+        menuInfo: ContextMenu.ContextMenuInfo?
+    ) {
+        super.onCreateContextMenu(menu, v, menuInfo)
+        menuInflater.inflate(R.menu.context_menu, menu) // Inflate context menu
+    }
+
+    // Xử lý khi người dùng chọn một mục trong Context Menu
+    override fun onContextItemSelected(item: MenuItem): Boolean {
+        val pos = (item.menuInfo as AdapterView.AdapterContextMenuInfo).position
+        val selectedStudent = studentList[pos] // Lấy sinh viên được chọn
+
+        when (item.itemId) {
+            R.id.action_edit -> {
+                val intent = Intent(this, AddStudentActivity::class.java)
+                intent.putExtra("hoten", selectedStudent.hoten)
+                intent.putExtra("mssv", selectedStudent.mssv)
+                // Gửi vị trí sinh viên cần chỉnh sửa
+                intent.putExtra("position", pos)
+                launcher.launch(intent) // Mở AddStudentActivity
+            }
+            R.id.action_remove -> {
+                studentList.removeAt(pos) // Xóa sinh viên khỏi danh sách
+                updateStudentList() // Cập nhật lại ListView
+            }
+        }
+        return super.onContextItemSelected(item)
+    }
 }
+
+

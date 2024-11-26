@@ -19,20 +19,14 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
-        android:id="@+id/button_open"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Open 2nd activity"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <Button
         android:id="@+id/button_add_student"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="294dp"
         android:text="Add student"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/button_open" />
+        app:layout_constraintBottom_toTopOf="@+id/text_result"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
         android:id="@+id/text_result"
@@ -62,12 +56,6 @@
         app:layout_constraintTop_toBottomOf="@+id/imageView"
         app:layout_constraintVertical_bias="0.0" />
 
-    <Button
-        android:id="@+id/button_open_other"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Open other app"
-        app:layout_constraintStart_toEndOf="@+id/button_open"
-        app:layout_constraintTop_toTopOf="parent" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
